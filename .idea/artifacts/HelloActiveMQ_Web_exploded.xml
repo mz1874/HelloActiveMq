@@ -1,0 +1,13 @@
+<component name="ArtifactManager">
+  <artifact type="exploded-war" name="HelloActiveMQ:Web exploded">
+    <output-path>$PROJECT_DIR$/out/artifacts/HelloActiveMQ_Web_exploded</output-path>
+    <root id="root">
+      <element id="javaee-facet-resources" facet="HelloActiveMQ/web/Web" />
+      <element id="directory" name="WEB-INF">
+        <element id="directory" name="classes">
+          <element id="module-output" name="HelloActiveMQ" />
+        </element>
+      </element>
+    </root>
+  </artifact>
+</component>

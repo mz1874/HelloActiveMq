@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/tx https://www.springframework.org/schema/tx/spring-tx.xsd">
+
+    <context:property-placeholder location="ActiveMQ.properties" />
+    <!--扫描-->
+    <context:component-scan base-package="com.spring,com.listener"/>
+
+    <!--配置连接工厂-->
+    <bean id="connectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+        <property name="brokerURL" value="${url}"/>
+        <property name="userName" value="${username}"/>
+        <property name="password" value="${password}"/>
+    </bean>
+
+    <!--配置消息生产者-->
+    <bean id="jmsFactory" class="org.apache.activemq.pool.PooledConnectionFactory" destroy-method="stop">
+        <property name="connectionFactory" ref="connectionFactory"/>
+        <property name="maxConnections" value="100"/>
+    </bean>
+
+    <!--配置主题-->
+    <bean id="JmsQueue" class="org.apache.activemq.command.ActiveMQQueue">
+        <constructor-arg index="0" value="SPRING_QUEUE"/>
+    </bean>
+
+    <bean id="JmsTopic" class="org.apache.activemq.command.ActiveMQTopic">
+        <!--构造器注入 0号参数-->
+        <constructor-arg index="0" value="SPRING_TOPIC"/>
+    </bean>
+
+
+    <bean id="JmsTemplate" class="org.springframework.jms.core.JmsTemplate">
+        <property name="sessionAcknowledgeMode" value="4"></property>
+        <property name="connectionFactory" ref="connectionFactory"/>
+        <property name="defaultDestination" ref="JmsTopic"/>
+        <property name="messageConverter">
+            <bean class="org.springframework.jms.support.converter.SimpleMessageConverter"></bean>
+        </property>
+    </bean>
+
+    <bean id="jmsContainerOne" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+        <property name="connectionFactory" ref="connectionFactory" />
+        <property name="destination" ref="JmsTopic" />
+        <property name="messageListener" ref="MyListener" />
+    </bean>
+
+</beans>
